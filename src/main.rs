@@ -16,6 +16,12 @@ fn main() -> ExitCode {
     };
 
     let re = Regex::new(&args.pattern).unwrap();
+
+    let ignore_re = match args.ignore {
+        Some(p) => Some(Regex::new(&p).unwrap()),
+        None => None,
+    };
+
     let subdir_length = config.subdir.as_os_str().to_str().unwrap().len();
     
     // Find subtitle files and sort
@@ -43,10 +49,14 @@ fn main() -> ExitCode {
             };
             // Slightly faster than str.replace()
             splice_out_all_and_replace_into(&mut text, text_slice, r"\N", ' ');
-
             if ! re.is_match(&text) {
                 continue; 
             }
+
+            if ignore_re.as_ref().is_some_and(|pat| pat.is_match(&text)){
+                continue;
+            }
+            
             // Details about the line of text
             for item in [trunc_path_str, ": ", start, " ", end, " => "] {
                 formated_line.push_str(item);
