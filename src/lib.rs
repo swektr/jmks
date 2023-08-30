@@ -55,7 +55,7 @@ pub struct Cli {
     #[clap(long,short,action)]
     pub depth: Option<i32>,
 
-    #[clap(long,short,value_name="PATTERN",action)]
+    #[clap(long,short,value_name="NEGATIVE PATTERN",action)]
     pub ignore: Option<String>,
 }
 
