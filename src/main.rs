@@ -58,7 +58,7 @@ fn main() -> ExitCode {
             }
             
             // Details about the line of text
-            for item in [trunc_path_str, ": ", start, " ", end, " => "] {
+            for item in ["\x1b[0;35m", trunc_path_str, "\x1b[0m: ", start, " ", end, "\x1b[0;34m => \x1b[0m"] {
                 formated_line.push_str(item);
             }
             
