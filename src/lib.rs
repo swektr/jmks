@@ -113,12 +113,8 @@ pub fn load_config(args: &Cli) -> Option<Config> {
 }
 
 fn read_config_file() -> Result<ConfigWrap,Box<dyn std::error::Error>> {
-
     let config_path = var("XDG_CONFIG_HOME")
-                    .or_else(|_| var("HOME")
-                        .map(|home| format!("{}/.config/jmks/config.toml",home))
-                    )?;        
-    
+        .or_else(|_| var("HOME").map(|home| format!("{}/.config/jmks/config.toml",home)))?;
     let contents = fs::read_to_string(&config_path)?;
     let config = toml::from_str(&contents)?;
     
