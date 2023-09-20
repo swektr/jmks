@@ -56,6 +56,15 @@ pub struct Cli {
     /// Ignore lines that contain this pattern
     #[clap(long,short,value_name="NEGATIVE PATTERN",action)]
     pub ignore: Option<String>,
+    /// Lines of context before & after match
+    #[clap(long,short = 'C',value_name="N LINES",action)]
+    pub context: Option<i32>,
+    /// Lines of context before match
+    #[clap(long,short = 'B',value_name="N LINES",action)]
+    pub before: Option<i32>,
+    /// Lines of context after match
+    #[clap(long,short = 'A',value_name="N LINES",action)]
+    pub after: Option<i32>,
 }
 
 
