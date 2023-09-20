@@ -47,14 +47,13 @@ pub struct Config {
 pub struct Cli {
     /// Pattern to search
     pub pattern: String,
-
     /// Set the subtitle directory
     #[clap(long,short,action)]
     pub subdir: Option<PathBuf>,
-
+    /// Set max search depth
     #[clap(long,short,action)]
     pub depth: Option<i32>,
-
+    /// Ignore lines that contain this pattern
     #[clap(long,short,value_name="NEGATIVE PATTERN",action)]
     pub ignore: Option<String>,
 }
