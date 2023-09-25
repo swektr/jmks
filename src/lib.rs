@@ -6,7 +6,7 @@ use regex::Regex;
 use serde_derive::Deserialize;
 use clap::Parser;
 
-pub const DEFAULT_DEPTH: i32 = 2;
+pub const DEFAULT_DEPTH: u32 = 2;
 pub mod string_carousel;
 
 trait PathExt {
@@ -25,7 +25,7 @@ impl PathExt for PathBuf {
 #[derive(Deserialize, Debug)]
 pub struct ConfigWrap {
     pub subdir: Option<PathBuf>,
-    pub depth:  Option<i32>,
+    pub depth:  Option<u32>,
 }
 
 impl Into<Config> for ConfigWrap {
@@ -39,7 +39,7 @@ impl Into<Config> for ConfigWrap {
 
 pub struct Config {
     pub subdir: PathBuf,
-    pub depth:  i32,
+    pub depth:  u32,
 
 }
 
@@ -52,22 +52,22 @@ pub struct Cli {
     pub subdir: Option<PathBuf>,
     /// Set max search depth
     #[clap(long,short,action)]
-    pub depth: Option<i32>,
+    pub depth: Option<u32>,
     /// Ignore lines that contain this pattern
     #[clap(long,short,value_name="NEGATIVE PATTERN",action)]
     pub ignore: Option<String>,
     /// Lines of context before & after match
     #[clap(long,short = 'C',value_name="N LINES",action)]
-    pub context: Option<i32>,
+    pub context: Option<u32>,
     /// Lines of context before match
     #[clap(long,short = 'B',value_name="N LINES",action)]
-    pub before: Option<i32>,
+    pub before: Option<u32>,
     /// Lines of context after match
     #[clap(long,short = 'A',value_name="N LINES",action)]
-    pub after: Option<i32>,
+    pub after: Option<u32>,
 }
 
-pub fn get_sub_files(paths: &mut Vec<PathBuf>, dir: &Path, depth: i32) -> Result<(), IOError> {
+pub fn get_sub_files(paths: &mut Vec<PathBuf>, dir: &Path, depth: u32) -> Result<(), IOError> {
     if depth <= 0 {
         return Ok(());
     }
