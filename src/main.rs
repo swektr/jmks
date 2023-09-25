@@ -4,7 +4,7 @@ use std::{process::ExitCode,
           io::{BufReader, BufRead}};
 use clap::Parser;
 use regex::Regex;
-use jmks::*;
+use jmks::{*, string_carousel::StringCarousel};
 
 fn main() -> ExitCode {
     // Set up
@@ -22,6 +22,18 @@ fn main() -> ExitCode {
         None => None,
     };
 
+    let (mut ctx_before, mut ctx_after) = match args.context {
+        Some(val) => (val, val),
+        None      => (0,0),
+    };
+    if let Some(val) = args.before {
+        ctx_before = val;
+    }
+    if let Some(val) = args.after {
+        ctx_after = val;
+    }
+
+
     let subdir_length = config.subdir.as_os_str().to_str().unwrap().len();
     
     // Find subtitle files and sort
@@ -30,40 +42,59 @@ fn main() -> ExitCode {
     paths.sort();
 
     let mut formated_line = String::new();
-    let mut text = String::new();
+    let mut line_buf = String::new();
+    let mut context_buf = StringCarousel::init_with(ctx_before as usize, || String::with_capacity(100));
+    let mut num_matches = 0;
+    let mut after_lines_left = 0;
+    let mut finished_printing_after_context = false;
     for path in &paths {
         let file = File::open(path).unwrap();
         let reader = BufReader::new(file);
-
         let path = path.as_os_str().to_str().unwrap();
         let trunc_path_str = &path[subdir_length..];
-        
         for line in reader.lines() {
             let line = line.unwrap();
+            // filter out non-^Dialogue lines:
             if  line.len() < 10 || &line.as_bytes()[..10] != b"Dialogue: " {
                 continue;
             }
-            let (start,end,text_slice) = match extract_sub_ass(&line) {
+            let (start, end, text_slice) = match extract_sub_ass(&line) {
                 Some(x) => x,
                 _ => continue,
             };
-            // Slightly faster than str.replace()
-            splice_out_all_and_replace_into(&mut text, text_slice, r"\N", ' ');
-            if ! re.is_match(&text) {
+            splice_out_all_and_replace_into(&mut line_buf, text_slice, r"\N", ' ');
+            let re_match = re.is_match(&line_buf);
+            let ig_match = ignore_re.as_ref().is_some_and(|pat| pat.is_match(&line_buf));
+            // Skip if line doesn't meet match criteria
+            if (!re_match || ig_match) && after_lines_left == 0 {
+                if ctx_before > 0 {
+                    context_buf.insert(
+                        &["\x1b[0;35m", trunc_path_str, "\x1b[0m: ", start, " ", end, "\x1b[0;34m : \x1b[0m", &line_buf]
+                    );
+                }
                 continue; 
             }
-
-            if ignore_re.as_ref().is_some_and(|pat| pat.is_match(&text)){
-                continue;
-            }
-            
             // Details about the line of text
-            for item in ["\x1b[0;35m", trunc_path_str, "\x1b[0m: ", start, " ", end, "\x1b[0;34m => \x1b[0m"] {
+            for item in ["\x1b[0;35m", trunc_path_str, "\x1b[0m: ", start, " ", end, "\x1b[0;34m : \x1b[0m"] {
                 formated_line.push_str(item);
             }
-            
-            highlight_matches(&mut formated_line, &text, &re);
-
+            if re_match && !ig_match {
+                after_lines_left = ctx_after;
+                highlight_matches(&mut formated_line, &line_buf, &re);
+                num_matches += 1;
+            } else {
+                formated_line.push_str(&line_buf);
+                after_lines_left -= 1;
+            }
+            if num_matches > 1 && ctx_before + ctx_after > 0 && finished_printing_after_context  {
+                finished_printing_after_context = false;
+                println!("--");
+            }
+            if after_lines_left == 0 {
+                finished_printing_after_context = true;
+            }
+            context_buf.into_iter().for_each(|ctx| println!("{ctx}"));
+            context_buf.clear_all();
             println!("{formated_line}");
             formated_line.clear(); 
         }

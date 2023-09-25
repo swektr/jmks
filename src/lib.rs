@@ -7,6 +7,7 @@ use serde_derive::Deserialize;
 use clap::Parser;
 
 pub const DEFAULT_DEPTH: i32 = 2;
+pub mod string_carousel;
 
 trait PathExt {
     fn has_extension(&self, e: &str) -> bool;
@@ -24,24 +25,23 @@ impl PathExt for PathBuf {
 #[derive(Deserialize, Debug)]
 pub struct ConfigWrap {
     pub subdir: Option<PathBuf>,
-    pub depth: Option<i32>,
+    pub depth:  Option<i32>,
 }
 
 impl Into<Config> for ConfigWrap {
     fn into(self) -> Config {
         Config {
             subdir: self.subdir.unwrap(),
-            depth: self.depth.unwrap(),
+            depth:  self.depth.unwrap(),
         }
     }
 }
 
 pub struct Config {
     pub subdir: PathBuf,
-    pub depth: i32,
+    pub depth:  i32,
 
 }
-
 
 #[derive(Parser, Debug)]
 pub struct Cli {
@@ -66,7 +66,6 @@ pub struct Cli {
     #[clap(long,short = 'A',value_name="N LINES",action)]
     pub after: Option<i32>,
 }
-
 
 pub fn get_sub_files(paths: &mut Vec<PathBuf>, dir: &Path, depth: i32) -> Result<(), IOError> {
     if depth <= 0 {
@@ -129,28 +128,14 @@ fn read_config_file() -> Result<ConfigWrap,Box<dyn std::error::Error>> {
     Ok(config)
 }
 
-
 pub fn extract_sub_ass(line: &String) -> Option<(&str, &str, &str)>{
-    fn index_of_nth_tgt(s: &str, n: usize, tgt: char) -> Option<(usize,usize)> {
-        let mut count = 0;
-        for (char_idx, (byte_idx, char)) in s.char_indices().enumerate() {
-            if char == tgt {
-                count += 1;
-                if count == n {
-                    return Some((char_idx, byte_idx)) ;
-                }
-            }
-        }
-        None
-    }
-
     let start = &line[12..22]; 
     let end = &line[23..33];
     let mut text = &line[34..];
     
     //Get index of Effect feild
     let (char_idx, byte_idx) = index_of_nth_tgt(text, 5, ',').unwrap();
-    
+
     // Make sure Effect feild is empty
     // Ignore lines with effects because they're usually are not actual dialogue
     text = match text.chars().nth(char_idx+1) {
@@ -163,6 +148,19 @@ pub fn extract_sub_ass(line: &String) -> Option<(&str, &str, &str)>{
         Some('{') => None,
         _ => Some((start,end,text)),
     }
+}
+
+fn index_of_nth_tgt(s: &str, n: usize, tgt: char) -> Option<(usize,usize)> {
+    let mut count = 0;
+    for (char_idx, (byte_idx, char)) in s.char_indices().enumerate() {
+        if char == tgt {
+            count += 1;
+            if count == n {
+                return Some((char_idx, byte_idx)) ;
+            }
+        }
+    }
+    None
 }
 
 fn splice_out<'a>(line: &'a str, tgt: &str) -> Option<(&'a str, &'a str)> {
