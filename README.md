@@ -19,13 +19,13 @@ Run program like this `jmks [OPTIONS] <PATTERN>`
 * `PATTERN` (required) Regex pattern.
 
 <u>Options:</u>
-* `-s, --subdir` -- Set the subtitle directory. 
-* `-d, --depth` -- Set maximum directory seach depth. (DEFAULT=2)
-* `-i, --ignore`  -- Ignore lines that contain this pattern
-* `-C, --context` -- Lines of context before & after match
-* `-B, --before` -- Lines of context before match
-* `-A, --after` -- Lines of context after match
-* `-h, --help   ` -- Print usage help.
+* `-s, --subdir=  ` -- Set the subtitle directory. 
+* `-d, --depth=   ` -- Set maximum directory seach depth. (DEFAULT=2)
+* `-i, --ignore=   `  -- Ignore lines that contain this pattern
+* `-C, --context=` -- Lines of context before & after match
+* `-B, --before=  ` -- Lines of context before match
+* `-A, --after=     ` -- Lines of context after match
+* `-h, --help        ` -- Print usage help.
 
 # Configuration
  You can avoid specifying the `--subdir` and `--depth` by creating a config.toml at `$XDG_CONFIG_HOME/jmks/config.toml`. If `XDG_CONFIG_HOME` is not set, then use `$HOME/.config/jmks/config.toml`.
