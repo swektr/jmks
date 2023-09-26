@@ -1,7 +1,7 @@
 # Jmks
 **J**i**m**aku**k**en**s**aku - 字幕検索 - Subtitle search
 
-Command line tool to search a directory of subtitle files for words/grammars/etc. 
+Command line tool to search a directory of subtitle files for words/grammars/etc. Only works for SSA V4+ subtiltes (.ass files)
 
 This is my second Rust program! It's another rewrite of an old Bash script I made that does the same thing.
 
@@ -10,7 +10,7 @@ This is my second Rust program! It's another rewrite of an old Bash script I mad
 **Rust**: built with version "1.70.0", but older versions likely work fine.
 
 # Building
-Run: `cargo build`
+Run: `cargo build --release`
 
 # Usage
 Run program like this `jmks [OPTIONS] <PATTERN>`
@@ -21,6 +21,10 @@ Run program like this `jmks [OPTIONS] <PATTERN>`
 <u>Options:</u>
 * `-s, --subdir` -- Set the subtitle directory. 
 * `-d, --depth` -- Set maximum directory seach depth. (DEFAULT=2)
+* `-i, --ignore`  -- Ignore lines that contain this pattern
+* `-C, --context` -- Lines of context before & after match
+* `-B, --before` -- Lines of context before match
+* `-A, --after` -- Lines of context after match
 * `-h, --help   ` -- Print usage help.
 
 # Configuration
