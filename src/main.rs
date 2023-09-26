@@ -7,16 +7,12 @@ use regex::Regex;
 use jmks::{*, string_carousel::StringCarousel};
 
 fn main() -> ExitCode {
-    // Set up
     let args = Cli::parse();
-
     let config = match load_config(&args) {
         Some(config) => config,
         None => return ExitCode::FAILURE,
     };
-
     let re = Regex::new(&args.pattern).unwrap();
-
     let ignore_re = match args.ignore {
         Some(p) => Some(Regex::new(&p).unwrap()),
         None => None,
@@ -58,14 +54,17 @@ fn main() -> ExitCode {
             if  line.len() < 10 || &line.as_bytes()[..10] != b"Dialogue: " {
                 continue;
             }
+            // Extract valid dialogue lines (ignore lines with effects)
             let (start, end, text_slice) = match extract_sub_ass(&line) {
                 Some(x) => x,
                 _ => continue,
             };
+            // .ass subtitles will use a "\N" to specify new lines, this makes searching
+            // inconvinient, so replace them with spaces instead
             splice_out_all_and_replace_into(&mut line_buf, text_slice, r"\N", ' ');
             let re_match = re.is_match(&line_buf);
             let ig_match = ignore_re.as_ref().is_some_and(|pat| pat.is_match(&line_buf));
-            // Skip if line doesn't meet match criteria
+            // Ignore lines that dont match UNLESS they are a part of the after-context
             if (!re_match || ig_match) && after_lines_left == 0 {
                 if ctx_before > 0 {
                     context_buf.insert(
@@ -78,6 +77,7 @@ fn main() -> ExitCode {
             for item in ["\x1b[0;35m", trunc_path_str, "\x1b[0m: ", start, " ", end, "\x1b[0;34m : \x1b[0m"] {
                 formated_line.push_str(item);
             }
+            // Higlight matches and start/reset after-context
             if re_match && !ig_match {
                 after_lines_left = ctx_after;
                 highlight_matches(&mut formated_line, &line_buf, &re);
@@ -86,6 +86,7 @@ fn main() -> ExitCode {
                 formated_line.push_str(&line_buf);
                 after_lines_left -= 1;
             }
+            // Add visual seperation between matches when there is context
             if num_matches > 1 && ctx_before + ctx_after > 0 && finished_printing_after_context  {
                 finished_printing_after_context = false;
                 println!("--");

@@ -128,6 +128,9 @@ fn read_config_file() -> Result<ConfigWrap,Box<dyn std::error::Error>> {
     Ok(config)
 }
 
+/// Return a slices of the start time, end time and actual text of the dialogue.
+///
+/// Lines that have any affects will get filtered out as well
 pub fn extract_sub_ass(line: &String) -> Option<(&str, &str, &str)>{
     let start = &line[12..22]; 
     let end = &line[23..33];
@@ -163,15 +166,6 @@ fn index_of_nth_tgt(s: &str, n: usize, tgt: char) -> Option<(usize,usize)> {
     None
 }
 
-fn splice_out<'a>(line: &'a str, tgt: &str) -> Option<(&'a str, &'a str)> {
-    let start = match line.find(tgt) {
-        Some(start) => start,
-        None => return None,
-    };
-    let end = start+tgt.len();
-    Some((&line[..start], &line[end..]))
-}
-
 pub fn splice_out_all_and_replace_into<'a>(into: &mut String, line: &'a str, tgt_cut: &str, tgt_repl: char) {
     into.clear();
     let mut next = line;
@@ -181,7 +175,15 @@ pub fn splice_out_all_and_replace_into<'a>(into: &mut String, line: &'a str, tgt
         next = right;
     }
     into.push_str(next);
-    
+}
+
+fn splice_out<'a>(line: &'a str, tgt: &str) -> Option<(&'a str, &'a str)> {
+    let start = match line.find(tgt) {
+        Some(start) => start,
+        None => return None,
+    };
+    let end = start+tgt.len();
+    Some((&line[..start], &line[end..]))
 }
 
 pub fn highlight_matches(formated_line: &mut String, text: &str, re: &Regex) {
