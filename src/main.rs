@@ -17,7 +17,6 @@ fn main() -> ExitCode {
         Some(p) => Some(Regex::new(&p).unwrap()),
         None => None,
     };
-
     let (mut ctx_before, mut ctx_after) = match args.context {
         Some(val) => (val, val),
         None      => (0,0),
@@ -28,15 +27,12 @@ fn main() -> ExitCode {
     if let Some(val) = args.after {
         ctx_after = val;
     }
-
-
-    let subdir_length = config.subdir.as_os_str().to_str().unwrap().len();
     
-    // Find subtitle files and sort
     let mut paths: Vec<PathBuf> = Vec::new();
     get_sub_files(&mut paths, &config.subdir, config.depth).unwrap();
     paths.sort();
 
+    let subdir_length = config.subdir.as_os_str().to_str().unwrap().len();
     let mut formated_line = String::new();
     let mut line_buf = String::new();
     let mut context_buf = StringCarousel::init_with(ctx_before as usize, || String::with_capacity(100));

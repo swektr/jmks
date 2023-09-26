@@ -7,6 +7,7 @@ use serde_derive::Deserialize;
 use clap::Parser;
 
 pub const DEFAULT_DEPTH: u32 = 2;
+const MAX_CONTEXT: i64 = 100;
 pub mod string_carousel;
 
 trait PathExt {
@@ -57,13 +58,16 @@ pub struct Cli {
     #[clap(long,short,value_name="NEGATIVE PATTERN",action)]
     pub ignore: Option<String>,
     /// Lines of context before & after match
-    #[clap(long,short = 'C',value_name="N LINES",action)]
+    #[clap(value_parser = clap::value_parser!(u32).range(0..=MAX_CONTEXT),
+           long,short = 'C',value_name="N LINES",action)]
     pub context: Option<u32>,
     /// Lines of context before match
-    #[clap(long,short = 'B',value_name="N LINES",action)]
+    #[clap(value_parser = clap::value_parser!(u32).range(0..=MAX_CONTEXT),
+           long,short = 'B',value_name="N LINES",action)]
     pub before: Option<u32>,
     /// Lines of context after match
-    #[clap(long,short = 'A',value_name="N LINES",action)]
+    #[clap(value_parser = clap::value_parser!(u32).range(0..=MAX_CONTEXT),
+           long,short = 'A',value_name="N LINES",action)]
     pub after: Option<u32>,
 }
 
