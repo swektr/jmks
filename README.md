@@ -13,20 +13,23 @@ This is my second Rust program! It's another rewrite of an old Bash script I mad
 Run: `cargo build --release`
 
 # Usage
-Run program like this `jmks [OPTIONS] <PATTERN>`
 
-<u>Arguments:</u>
-* `PATTERN` (required) Regex pattern.
+```
+jmks [OPTIONS] <PATTERN>
 
-<u>Options:</u>
-* `-s, --subdir=  ` -- Set the subtitle directory. 
-* `-d, --depth=   ` -- Set maximum directory seach depth. (DEFAULT=2)
-* `-i, --ignore=   `  -- Ignore lines that contain this pattern
-* `-C, --context=` -- Lines of context before & after match
-* `-B, --before=  ` -- Lines of context before match
-* `-A, --after=     ` -- Lines of context after match
-* `-h, --help        ` -- Print usage help.
+Arguments:
+  <PATTERN>  Pattern to search
 
+Options:
+  -s, --subdir <SUBDIR>            Set the subtitle directory
+  -d, --depth <DEPTH>              Set max search depth
+  -i, --ignore <NEGATIVE PATTERN>  Ignore lines that contain this pattern
+  -C, --context <N LINES>          Lines of context before & after match
+  -B, --before <N LINES>           Lines of context before match
+  -A, --after <N LINES>            Lines of context after match
+  -h, --help                       Print help
+
+```
 # Configuration
  You can avoid specifying the `--subdir` and `--depth` by creating a config.toml at `$XDG_CONFIG_HOME/jmks/config.toml`. If `XDG_CONFIG_HOME` is not set, then use `$HOME/.config/jmks/config.toml`.
 
