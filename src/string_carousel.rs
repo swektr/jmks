@@ -1,5 +1,6 @@
 pub struct StringCarousel {
     data:     Vec<String>,
+    /// Insert position
     pos:      usize,
 }
 
@@ -40,7 +41,7 @@ impl<'a> Iterator for StringCarouselIter<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         let size = self.string_carousel.data.len();
         let pos  = self.string_carousel.pos;
-        if self.idx < self.string_carousel.data.len() {
+        if self.idx < size {
             let data_idx = match pos < self.idx {
                 true  => pos + (size - self.idx),
                 false => pos - self.idx,
